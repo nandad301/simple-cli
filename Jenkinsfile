@@ -1,5 +1,9 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'php:8.2-cli'
+        }
+    }
 
     stages {
         stage('Clone Repo') {
@@ -16,37 +20,22 @@ pipeline {
 
         stage('Run Unit Test') {
             steps {
-                script {
-                    if (isUnix()) {
-                        sh 'php tests/index_test.php'
-                    } else {
-                        bat 'run_tests.bat'
-                    }
-                }
+                echo 'Menjalankan unit test...'
+                sh 'php tests/index_test.php'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                script {
-                    if (isUnix()) {
-                        sh 'docker build -t php-simple-app .'
-                    } else {
-                        bat 'docker build -t php-simple-app .'
-                    }
-                }
+                echo 'Build Docker Image...'
+                sh 'docker build -t php-simple-app .'
             }
         }
 
         stage('Deploy Container') {
             steps {
-                script {
-                    if (isUnix()) {
-                        sh 'docker run -d -p 9090:9090 php-simple-app'
-                    } else {
-                        bat 'docker run -d -p 9090:9090 php-simple-app'
-                    }
-                }
+                echo 'Menjalankan container...'
+                sh 'docker run -d -p 9090:9090 php-simple-app'
             }
         }
     }
