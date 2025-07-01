@@ -6,12 +6,7 @@ WORKDIR /app
 RUN docker-php-ext-install pdo_mysql
 
 # Tambahkan user jenkins ke grup docker
-FROM jenkins/jenkins:lts
-
-USER root
 RUN usermod -aG docker jenkins
-
-USER jenkins
 
 COPY .
 
