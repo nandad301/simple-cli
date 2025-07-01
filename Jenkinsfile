@@ -1,21 +1,16 @@
 pipeline {
     agent {
         docker {
-            image 'php:8.2-cli'
+            image 'php-docker-cli' // image custom yang kamu build
             args '-v /var/run/docker.sock:/var/run/docker.sock'
         }
     }
 
     stages {
-        stage('Clone Repo') {
+        stage('Checkout') {
             steps {
+                checkout scm
                 echo '✅ Repo berhasil ter-clone oleh SCM.'
-            }
-        }
-
-        stage('Install Dependencies') {
-            steps {
-                echo '📦 Tidak ada dependency untuk di-install.'
             }
         }
 
