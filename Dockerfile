@@ -1,14 +1,11 @@
-# Menggunakan image PHP
-FROM php:7.4-cli
+# docker build -t myapp:alpine .
+FROM php:8.1-cli-alpine
 
-# Menyalin source code ke direktori kerja
-COPY src/ /app/src/
+WORKDIR /app
+# ekstensions
+RUN docker-php-ext-install pdo_mysql
 
-# Set direktori kerja
-WORKDIR /app/src/
+COPY .
 
-# Menjalankan perintah untuk menginstal dependensi jika ada
-# RUN apt-get update && apt-get install -y ...
-
-# Menjalankan aplikasi
-CMD ["php", "index.php"]
+EXPOSE 9090
+CMD ["php", "-S", "0.0.0.0:9090", "-t", "src"]

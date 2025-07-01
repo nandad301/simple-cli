@@ -1,29 +1,52 @@
 pipeline {
-    agent {
-        docker {
-            image 'php:7.4-cli'
-            args '-v /path/to/your/code:/app'
-        }
-    }
+    agent any
+
     stages {
-        stage('Build') {
+        stage('Clone Repo') {
+            steps {
+                echo 'Repo sudah ter-clone oleh SCM.'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                echo 'Tidak ada dependency untuk di-install.'
+            }
+        }
+
+        stage('Run Unit Test') {
             steps {
                 script {
-                    sh 'docker build -t my-php-app .'
+                    if (isUnix()) {
+                        sh 'php tests/index_test.php'
+                    } else {
+                        bat 'run_tests.bat'
+                    }
                 }
             }
         }
-        stage('Test') {
+
+        stage('Build Docker Image') {
             steps {
                 script {
-                    sh 'php /app/tests/index_test.php'
+                    if (isUnix()) {
+                        sh 'docker build -t php-simple-app .'
+                    } else {
+                        bat 'docker build -t php-simple-app .'
+                    }
                 }
             }
         }
-        stage('Deploy') {
+
+        stage('Deploy Container') {
             steps {
-                echo 'Deploying application...'
-                // Tambah langkah deploy di sini
+                script {
+                    if (isUnix()) {
+                        sh 'docker run -d -p 9090:9090 php-simple-app'
+                    } else {
+                        bat 'docker run -d -p 9090:9090 php-simple-app'
+                    }
+                }
             }
         }
     }
