@@ -1,39 +1,52 @@
 pipeline {
-    agent {
-        docker {
-            image 'php:8.1-cli'
-        }
-    }
+    agent any
+
     stages {
         stage('Clone Repo') {
             steps {
                 echo 'Repo sudah ter-clone oleh SCM.'
             }
         }
+
         stage('Install Dependencies') {
             steps {
                 echo 'Tidak ada dependency untuk di-install.'
             }
         }
+
         stage('Run Unit Test') {
             steps {
-                sh 'php tests/index_test.php'
+                script {
+                    if (isUnix()) {
+                        sh 'php tests/index_test.php'
+                    } else {
+                        bat 'run_tests.bat'
+                    }
+                }
             }
         }
+
         stage('Build Docker Image') {
-            when {
-                expression { currentBuild.result == null || currentBuild.result == 'SUCCESS' }
-            }
             steps {
-                echo 'Build Docker Image stage would run here.'
+                script {
+                    if (isUnix()) {
+                        sh 'docker build -t php-simple-app .'
+                    } else {
+                        bat 'docker build -t php-simple-app .'
+                    }
+                }
             }
         }
+
         stage('Deploy Container') {
-            when {
-                expression { currentBuild.result == null || currentBuild.result == 'SUCCESS' }
-            }
             steps {
-                echo 'Deploy Container stage would run here.'
+                script {
+                    if (isUnix()) {
+                        sh 'docker run -d -p 9090:9090 php-simple-app'
+                    } else {
+                        bat 'docker run -d -p 9090:9090 php-simple-app'
+                    }
+                }
             }
         }
     }
