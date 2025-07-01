@@ -1,0 +1,3 @@
+@echo off
+echo Running tests...
+php tests\index_test.php

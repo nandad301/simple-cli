@@ -1,27 +1,17 @@
 <?php
-// index_test.php
+require_once __DIR__ . '/../src/functions.php';
 
-// Autoload dependencies jika menggunakan Composer
-require '../vendor/autoload.php';
-
-// Memasukkan file yang akan diujikan
-require '../src/functions.php'; // Misalnya jika ada fungsi dalam file ini
-
-// Menggunakan PHPUnit untuk menjalankan unit tests
-use PHPUnit\Framework\TestCase;
-
-class ExampleTest extends TestCase
-{
-    // Test untuk fungsi tertentu
-    public function testAddingNumbers()
-    {
-        $this->assertEquals(4, add(2, 2)); // Misalnya ada fungsi add
+function assertEqual($expected, $actual, $testName) {
+    if ($expected === $actual) {
+        echo "[PASS] $testName\n";
+    } else {
+        echo "[FAIL] $testName: Expected '$expected', got '$actual'\n";
     }
-
-    // Tambahkan lebih banyak tests sesuai kebutuhan
 }
 
-// Menjalankan PHPUnit
-if (PHPUnit\TextUI\Command::main() === null) {
-    exit(1);
+function runTests() {
+    assertEqual("Hello, John!", sayHello("John"), "sayHello() should return correct greeting");
 }
+
+runTests();
+?>
