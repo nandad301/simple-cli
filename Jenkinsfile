@@ -1,11 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-        PHP_EXEC = isUnix() ? 'php' : 'php.exe'
-        DOCKER = isUnix() ? 'docker' : 'docker.exe'
-    }
-
     stages {
         stage('Clone Repo') {
             steps {
@@ -16,8 +11,9 @@ pipeline {
         stage('Cek Ketersediaan PHP') {
             steps {
                 script {
+                    def phpCmd = isUnix() ? 'php' : 'php.exe'
                     echo "🔍 Mengecek apakah PHP tersedia..."
-                    def status = sh(script: "${env.PHP_EXEC} -v", returnStatus: true)
+                    def status = sh(script: "${phpCmd} -v", returnStatus: true)
                     if (status != 0) {
                         error "❌ PHP tidak ditemukan di environment Jenkins. Harap install PHP atau gunakan Docker agent."
                     }
@@ -34,8 +30,9 @@ pipeline {
         stage('Run Unit Test') {
             steps {
                 script {
+                    def phpCmd = isUnix() ? 'php' : 'php.exe'
                     echo '🧪 Menjalankan unit test...'
-                    sh "${env.PHP_EXEC} tests/index_test.php"
+                    sh "${phpCmd} tests/index_test.php"
                 }
             }
         }
@@ -43,12 +40,13 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
+                    def dockerCmd = isUnix() ? 'docker' : 'docker.exe'
                     echo '🔧 Membangun Docker image...'
-                    def status = sh(script: "${env.DOCKER} --version", returnStatus: true)
+                    def status = sh(script: "${dockerCmd} --version", returnStatus: true)
                     if (status != 0) {
                         error "❌ Docker tidak tersedia. Pastikan Docker terinstall dan Jenkins memiliki akses ke Docker daemon."
                     }
-                    sh "${env.DOCKER} build -t php-simple-app ."
+                    sh "${dockerCmd} build -t php-simple-app ."
                 }
             }
         }
@@ -56,8 +54,9 @@ pipeline {
         stage('Deploy Container') {
             steps {
                 script {
+                    def dockerCmd = isUnix() ? 'docker' : 'docker.exe'
                     echo '🚀 Men-deploy container...'
-                    sh "${env.DOCKER} run -d -p 9090:9090 php-simple-app"
+                    sh "${dockerCmd} run -d -p 9090:9090 php-simple-app"
                 }
             }
         }
