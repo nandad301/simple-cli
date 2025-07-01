@@ -1,37 +1,51 @@
 pipeline {
-    agent {
-        docker {
-            image 'php-docker-cli' // image custom yang kamu build
-            args '-v /var/run/docker.sock:/var/run/docker.sock'
-        }
-    }
+    agent any
 
     stages {
-        stage('Checkout') {
+        stage('Clone Repo') {
             steps {
-                checkout scm
-                echo '✅ Repo berhasil ter-clone oleh SCM.'
+                echo 'Repo sudah ter-clone oleh SCM.'
             }
         }
 
+        stage('Install Dependencies') {
+            steps {
+                echo 'Tidak ada dependency untuk di-install.'
+            }
+        }
         stage('Run Unit Test') {
             steps {
-                echo '🧪 Menjalankan unit test...'
-                sh 'php tests/index_test.php'
+                script {
+                    if (isUnix()) {
+                        sh 'php tests/index_test.php'
+                    } else {
+                        bat 'run_tests.bat'
+                    }
+                }
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                echo '🔧 Membangun Docker image...'
-                sh 'docker build -t php-simple-app .'
+                script {
+                    if (isUnix()) {
+                        sh 'docker build -t php-simple-app .'
+                    } else {
+                        bat 'docker build -t php-simple-app .'
+                    }
+                }
             }
         }
 
         stage('Deploy Container') {
             steps {
-                echo '🚀 Men-deploy container...'
-                sh 'docker run -d -p 9090:9090 php-simple-app'
+                script {
+                    if (isUnix()) {
+                        sh 'docker run -d -p 9090:9090 php-simple-app'
+                    } else {
+                        bat 'docker run -d -p 9090:9090 php-simple-app'
+                    }
+                }
             }
         }
     }
