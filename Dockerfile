@@ -5,6 +5,9 @@ WORKDIR /app
 # ekstensions
 RUN docker-php-ext-install pdo_mysql
 
+# Tambahkan user jenkins ke grup docker
+RUN usermod -aG docker jenkins
+
 COPY .
 
 EXPOSE 9090
